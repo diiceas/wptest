@@ -564,3 +564,71 @@ require get_parent_theme_file_path( '/inc/customizer.php' );
  * SVG icons functions and filters.
  */
 require get_parent_theme_file_path( '/inc/icon-functions.php' );
+
+/* Custom Post Type */
+function custom_post_type(){
+	$labels = array(
+		'name' => 'Days',
+		'singular_name'=> 'Day',
+		'add_new' => 'Add Day ~Left Menu',
+		'all_items' => 'All Items ~Left Menu',
+		'add_new_item' => 'Add Item ~Label Text',
+		'edit_item' => 'Edit Item ~Label Text',
+		'new_item' => 'New Item',
+		'view_item' => 'View Item',
+		'search_item' => 'Search Day',
+		'not_found' => 'No items found',
+		'not_found_in_trash' => 'No items found in trash',
+		'parent_item_colon' => 'Parent Item'
+	);
+	$args = array(
+		'labels' => $labels,
+		'public' => true,
+		'has_archive' => true,
+		'publicly_queriable' => true,
+		'query_var' => true,
+		'rewrite' => true,
+		'capability_type' => 'post',
+		'hierarchical' => false,
+		'supports' => array(
+			'title',
+			'editor',
+			'excerpt',
+			'thumbnail',
+			'revisions'
+		),
+		'taxonomies' => array('category', 'post_tag'),
+		'menu_position' => 5,
+		'exclude_from_search' => false
+	);
+	register_post_type('days_url_posttype', $args);	
+}
+add_action('init', 'custom_post_type');
+
+add_action('init', 'setup_post_type');
+
+function setup_post_type(){
+	register_post_type('weeks', array(
+		'labels' => array(
+			'name' => __('Weeks', 'weeks'),
+			'singular_name' => __('Week', 'week'),
+		),
+		'show_ui' => true,
+		'has_archive' => false,
+		'supports' => array('title'),
+		'show_in_rest' => true,
+		'rest_base' => 'weeks',
+		'rest_controller_class' => 'WP_REST_Posts_Controller'
+	));
+};
+
+/* Resources */
+function add_scripts_and_styles() {
+	//wp_enqueue_style( 'twentyseventeen-fonts', twentyseventeen_fonts_url(), array(), null );
+	wp_enqueue_script( 'main_js', get_template_directory_uri() . '/js/main.js', NULL, 1.0, true);
+	
+	wp_localize_script('main_js', 'magicalData', array(
+		'nonce' => wp_create_nonce('wp_rest')
+	));
+}
+add_action( 'wp_enqueue_scripts', 'add_scripts_and_styles' );
